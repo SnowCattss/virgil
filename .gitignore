@@ -1,0 +1,14 @@
+# personal settings and generated files stay off GitHub
+settings.yaml
+*.xlsx
+geo_metadata/
+backups/
+~tmp_*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+build/

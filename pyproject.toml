@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "virgil"
+version = "0.1.0"
+description = "Collect GEO/SRA run metadata into one curated Excel workbook"
+requires-python = ">=3.8"
+dependencies = ["openpyxl>=3.0", "pyyaml>=5.1"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+virgil = "virgil.cli:main"
+
+[tool.setuptools]
+packages = ["virgil"]
