@@ -11,7 +11,7 @@ import argparse
 import sys
 from pathlib import Path
 
-#from .deps import check_dependencies
+from .deps import check_dependencies
 
 default_tsv_dir = "GEO Metadata"
 
@@ -21,8 +21,8 @@ def main():
         description = " Collect GEO/SRA run metadata and build one Excel workbook."
     )
 
-    # Each subcommand gets its own help option "--help" 
-    # dest = "command" stores what subcommand was used in args.command
+    """Each subcommand gets its own help option "--help" 
+    dest = "command" stores what subcommand was used in args.command"""
 
     commands= parser.add_subparsers( dest = "command", required = True)
 
@@ -47,7 +47,7 @@ def main():
         sys.exit("\nAborted.")
 
 def gse_list_from(args):
-    # GSE numbers from cli and/or list file, without repeats
+    """ GSE numbers from cli and/or list file, without repeats"""
 
     from .fetch import read_gse_list 
 
@@ -65,7 +65,7 @@ def gse_list_from(args):
 
 
 def run_fetch(args):
-    # Download every study into the --out folder
+    """ Download every study into the --out folder"""
 
     from .fetch import pull_studies
 
