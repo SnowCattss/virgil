@@ -29,6 +29,14 @@ ENA_URL = "https://www.ebi.ac.uk/ena/portal/api/filereport"
 # NCBI allows 3 requests per second without an API key.
 PAUSE_SECONDS = 0.4
 
+def read_gse_list():
+    raise NotImplementedError
+
+def pull_studies():
+    raise NotImplementedError
+
+    
+
 def download_text(url, params, tries=3):
     raise NotImplementedError
 
@@ -65,8 +73,3 @@ def get_fastq_links():
 def pull_one():
     raise NotImplementedError
 
-def read_gse_list():
-    raise NotImplementedError
-
-def pull_studies():
-    raise NotImplementedError
