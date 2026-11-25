@@ -11,7 +11,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from .deps import check_dependencies
+from .deps import check_deps
+from .fetch import read_gse_list
 
 default_tsv_dir = "GEO Metadata"
 
@@ -38,6 +39,7 @@ def main():
     build.add_argument("--gse-file", metavar="Input File", help= "Uses text file with GSE numbers, downloads them, then updates workbook")
 
     args = parser.parse_args()
+    check_deps()
 
     try:
         if args.command == "fetch":
@@ -48,9 +50,7 @@ def main():
 
 def gse_list_from(args):
     """ GSE numbers from cli and/or list file, without repeats"""
-
-    from .fetch import read_gse_list 
-
+    
     gses = []
     for gse in args.gse:
         gse = gse.strip().upper() 
