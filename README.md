@@ -1,8 +1,6 @@
 # virgil
 
-> **Work in progress.** This is the outline: every function has its docstring and
-> its steps as comments, and raises `NotImplementedError` until it's written.
-> The tests in `tests/` describe what the finished tool must do.
+> **Work in progress.**
 
 Turns GEO/SRA run metadata into one Excel workbook:
 
