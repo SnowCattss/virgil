@@ -11,6 +11,7 @@ Used by...
 """
 
 import csv
+import io
 import re
 import ssl
 import sys
@@ -109,35 +110,171 @@ def pull_studies(gses, out_dir):
         (out_dir / "failed.txt").write_text("\n".join(failed) + "\n", encoding= "utf-8")
         print("GSE's that failed are in failed.txt")
 
-def parse_soft():
-    raise NotImplementedError
+def parse_soft(text):
+    """Split's GEO's soft text into records, one dict per sample """
+    records= []
+    current= None
+    
+    for line in text.splitlines():
 
-def first():
-    raise NotImplementedError
+        if line.startswith("^"):
+            current= {"_id": line.split("=", 1)[-1].strip()}
+            records.append(current)
 
-def joined():
-    raise NotImplementedError
+        elif line.startswith("!") and current is not None and "=" in line:
+            key, value = line[1:].split("=", 1)
+            current.setdefault(key.strip(), []).append(value.strip())
 
-def column_name():
-    raise NotImplementedError
+    return records
+
+def first(record, field):
+    """First value of a field"""
+
+    values= record.get(field, [])
+    
+    return values[0] if values else ""
+
+def joined(record, field):
+    """Join values of a field into one string"""
+   
+    return " ".join(record.get(field, []))
+
+def column_name(key):
+    """Mimic the way dante turn a characteristic lable into colum name"""
+
+    return re.sub(r"[^A-Za-z0-9_.]", ".", key.strip())
 
 def get_series(gse):
-    raise NotImplementedError
+    """Series record: title, pubmed ID, links to SRA"""
+
+    text= download_text(GEO_URL, {"acc": gse, "targ": "self", "from": "text", "view": "brief"})
+    records= parse_soft(text)
+
+    if not records:
+        raise RuntimeError("GEO returned nothing; check GSE number")
+
+    return records[0]
 
 def get_samples(gse):
-    raise NotImplementedError
+    """ One ditc per sample in series"""
 
-def read_runinfo():
-    raise NotImplementedError
+    text = download_text(GEO_URL, {"acc": gse, "targ": "gsm", "form": "text", "view": "brief"})
+    samples= []
 
-def get_runs():
-    raise NotImplementedError
+    for record in parse_soft(text):
+        sample= {
+            "GSM": record["_id"],
+            "title": first(record, "Sample_title"),
+            "source_name": first(record, "Sample_source_name_ch1"),
+            "organism": first(record, "Sample_organism_ch1"),
+            "library_strategy_geo": first(record, "Sample_library_strategy"),
+            "treatment_protocol": joined(record, "Sample_treatment_protocol_ch1"),
+            "growth_protocol": joined(record, "Sample_growth_protocol_ch1"),
+            "description": joined(record, "Sample_description"),
+        }
 
-def get_runs_for(): 
-    raise NotImplementedError
+        for number, line in enumerate(record.get("Sample_characteristics_ch1", []), start= 1):
 
-def get_fastq_links():
-    raise NotImplementedError
+            if ":" in line:
+                key, value= line.split(":", 1)
+                sample[column_name(key)] = value.strip()
+            
+            else:
+                sample[f"characteristic_{number}"] = line.strip()
+
+        sample["SRX_from_geo"] = ""
+
+        for relation in record.get("Sample_relation", []):
+            match= re.search(r"SRX\d", relation)
+
+            if match:
+                sample["SRX_from_get"] = match.group(0)
+        
+        samples.append(samples)
+    
+    return samples
+
+def read_runinfo(text):
+    """The SRA run table comes back as CSV. Return a list of dicts"""
+    rows= list(csv.DictReader(io.StringIO(text)))
+    
+    return [row for row in rows if row.get("Run") and row.get("Run") != "Run"]
+
+
+def get_runs(series, samples):
+    """Each SRR that belongs to this series"""
+
+    wanted_srx= {s["SRX_from_geo"] for s in samples if s["SRX_from_geo"]}
+
+    study_ids = set()
+    for relation in series.get("Series_relation", []):
+        study_ids.update(re.findall(r"SRP\d+", relation))
+
+    runs= []
+
+    for srp in sorted(study_ids):
+        runs.extend(get_runs_for(srp))
+
+     #Keep only runs from this series' samples.
+    runs= [r for r in runs if r.get("Experiment") in wanted_srx]
+
+    have = {r.get("Experiment") for r in runs}
+
+    for srx in sorted(wanted_srx - have):
+        runs.extened(get_runs_for(srx))
+
+    # Filter again and drop repeats
+    unique= {}
+    for run in runs:
+
+        if run.get("Experiment") in wanted_srx and run["Run"] not in unique:
+            unique[run["Runs"]] = run
+    
+    return list(unique.values())
+
+
+def get_runs_for(accession): 
+    
+    try:
+        runs = read_runinfo(download_text(RUNINFO_URL, {"acc": accession}))
+
+        if runs:
+            return runs
+        
+    except (urllib.error.URLError, RuntimeError) as error:
+        print(f"     Direct SRA lookup field for {accession} ({error}), trying E-utilities")
+
+    found = download_text(EUTILS_URL + "esearch.fcgi",
+                          {"db": "sra", "term": accession, "retmax": 10000})
+    
+    ids= re.findall(r"<Id>(\d+)</Id>", found)
+
+    if not ids:
+        return []
+    
+    text= download_text(EUTILS_URL + "efetch.fcgi",
+                        {"db": "sra", "id": ",".join(ids), "rettype": "runinfo", "retmode": "text"})
+    
+    return read_runinfo(text)
+
+def get_fastq_links(run_ids):
+    """{SRR: {fastq_ftp, fastq_aspera, fastq_md5}} from ENA"""
+    links = {}
+
+    for srr in run_ids:
+        
+        try:
+            text = download_text(ENA_URL, {
+                "accession": srr, "result": "read_run", "format": "tsv", "field": "run_accession,fast_ftp,fastq_aspera, fastq_md5"
+            })
+        except (OSError, RuntimeError) as error:
+            print(f"    no ENA links for {srr} ({error})")
+            continue
+
+        for row in csv.DictReader(io.StringIO(text), delimiter= "\t"):
+            links[row.get("run_accession", srr)] = row
+
+    return links
 
 def pull_one(gse, out_dir):
     """Download everything for one GSE adn write it to GSExxxxx_complete_metadata.tsv"""
@@ -195,5 +332,6 @@ def pull_one(gse, out_dir):
         writer= csv.DictWriter(handle, fieldnames= columns, delimiter= "\t", restval= "")
         writer.writeheader()
         writer.writerows(rows)
+    
     print(f"     saved {out_file.name}")
     return len(rows)
