@@ -26,7 +26,7 @@ RUNINFO_URL = "https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/runinfo"
 EUTILS_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 ENA_URL = "https://www.ebi.ac.uk/ena/portal/api/filereport"
 
-# NCBI allows 3 requests per second without an API key.
+# NCBI allows 3 requests per second without an API key
 pause_seconds = 0.4
 
 def download_text(url, params, tries=3):
@@ -200,7 +200,6 @@ def read_runinfo(text):
     
     return [row for row in rows if row.get("Run") and row.get("Run") != "Run"]
 
-
 def get_runs(series, samples):
     """Each SRR that belongs to this series"""
 
@@ -231,7 +230,6 @@ def get_runs(series, samples):
             unique[run["Run"]] = run
     
     return list(unique.values())
-
 
 def get_runs_for(accession): 
     

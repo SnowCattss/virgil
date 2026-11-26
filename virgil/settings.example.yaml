@@ -1,0 +1,41 @@
+# Settings for Virgil
+# Copy this file into settings.yaml and change what you need
+
+# Folder with the GSExxxxxx+complete_metadata.tsv files (from 'virgil fetch' or dante)
+tsv_dir: GEO Metadata
+
+# The workbook virgil write to. If it exists it will update, if not it is created
+workbook: combined_metadata.xlsx
+
+# Only runs with one of these LibraryStrategy values go on the 'Overview' sheet
+# All runs go on the 'Raw' sheet
+assays: [ATAC-seq]
+
+# Only runs from one of these organisms go on the 'Overview' sheet
+organisms: [Homo sapiens]
+
+# What to write when something is known to be empty
+empty_value: None
+
+# Where each 'Overview' column comes from, order is preference
+# Names are the column headers in the .tsv files
+fields:
+  Cell_line: [cell.line, cell_line, cell.type, tissue, source_name]
+  Treatment: [treatment, treatment.condition, agent]
+  Time: [time, timepoint, time.point]
+
+# These columns are used if nothing better is known
+# Maked as NEEDS REVIEW
+weak_fields: [tissue, source_name]
+
+# Extra columns joined into 'Others' as "name: value; name: value"
+others_fields: [genotype, sgrna, stimulation, transfection]
+
+# Values that are treated as empty
+ignore_values: ["n/a", na, "--", "-", hg19, hg38]
+
+# Treatement values that are control/untreated
+untreated_values: [nt, untreated, control, none, no treatment, mock]
+
+# After a build, does it ask to open the links of each new study
+offer_to_open_links: true

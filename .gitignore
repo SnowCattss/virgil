@@ -2,6 +2,9 @@
 settings.yaml
 *.xlsx
 geo_metadata/
+GEO Metadata/
+GSE*_complete_metadata.tsv
+failed.txt
 backups/
 ~tmp_*
 
