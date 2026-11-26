@@ -147,7 +147,7 @@ def column_name(key):
 def get_series(gse):
     """Series record: title, pubmed ID, links to SRA"""
 
-    text= download_text(GEO_URL, {"acc": gse, "targ": "self", "from": "text", "view": "brief"})
+    text= download_text(GEO_URL, {"acc": gse, "targ": "self", "form": "text", "view": "brief"})
     records= parse_soft(text)
 
     if not records:
@@ -185,12 +185,12 @@ def get_samples(gse):
         sample["SRX_from_geo"] = ""
 
         for relation in record.get("Sample_relation", []):
-            match= re.search(r"SRX\d", relation)
+            match= re.search(r"SRX\d+", relation)
 
             if match:
-                sample["SRX_from_get"] = match.group(0)
+                sample["SRX_from_geo"] = match.group(0)
         
-        samples.append(samples)
+        samples.append(sample)
     
     return samples
 
@@ -221,14 +221,14 @@ def get_runs(series, samples):
     have = {r.get("Experiment") for r in runs}
 
     for srx in sorted(wanted_srx - have):
-        runs.extened(get_runs_for(srx))
+        runs.extend(get_runs_for(srx))
 
     # Filter again and drop repeats
     unique= {}
     for run in runs:
 
         if run.get("Experiment") in wanted_srx and run["Run"] not in unique:
-            unique[run["Runs"]] = run
+            unique[run["Run"]] = run
     
     return list(unique.values())
 
@@ -265,7 +265,7 @@ def get_fastq_links(run_ids):
         
         try:
             text = download_text(ENA_URL, {
-                "accession": srr, "result": "read_run", "format": "tsv", "field": "run_accession,fast_ftp,fastq_aspera, fastq_md5"
+                "accession": srr, "result": "read_run", "format": "tsv", "fields": "run_accession,fastq_ftp,fastq_aspera,fastq_md5"
             })
         except (OSError, RuntimeError) as error:
             print(f"    no ENA links for {srr} ({error})")
