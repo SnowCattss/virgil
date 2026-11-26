@@ -18,7 +18,7 @@ defaults = {
         "Time": ["time", "timepoint", "time.point"],
     },
     "weak_fields": ["tissue", "source_name"],
-    "others_fields": ["genotype", "sgrna", "stimulation", "transfection"],
+    "other_fields": ["genotype", "sgrna", "stimulation", "transfection"],
     "ignore_values": ["n/a", "na", "--", "-", "hg19", "hg38"],
     "untreated_values": ["nt", "untreated", "control", "none", "no treatment", "mock"],
     "offer_to_open_links": True,
