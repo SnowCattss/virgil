@@ -30,7 +30,7 @@ def check_deps():
     if answer != "y":
         sys.exit("Not installed. To install manually, run:\n" + " ".join(command))
 
-    result = subprocess.run(command)
+    result = subprocess.run(command, check= False)
     if result.returncode != 0:
         sys.exit("pip install failed. If it mentioned an 'externally managed environment' see README")
     
