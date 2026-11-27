@@ -88,9 +88,10 @@ Needs Python 3.8 or newer.
 
 1) Download Python from [python.org/downloads](https://www.python.org/downloads/)
 
-2) Open the downloaded file (e.g. `python-3.x.x-amd64.exe`) and install
 > [!IMPORTANT]
 > Check "Add python.exe to PATH" on the first screen before clicking install
+2) Open the downloaded file (e.g. `python-3.x.x-amd64.exe`) and install
+
 
 3) Download and install Git from [git-scm.com/downloads/win](https://git-scm.com/downloads/win)
 
@@ -114,8 +115,8 @@ virgil fetch --gse-file gses.txt        # download every GSE in a text file (Acc
 virgil fetch GSE123456 --out dir_path   # change the destination of .tsv files 
 
 virgil build                            # add new studies in tsv_dir to the workbook (will create it if none)
-virgil build --fetch GSE123456          # download first, then build workbook (GSE can be left out)
-virgil build --gse-file gses.txt        # same, for a list
+virgil build --fetch GSE123456          # download given, then build workbook (GSE can be left out)
+virgil build --gse-file gses.txt        # download from list, then build workbook (Accepts comma, semicolon, newline, or space separation)
 virgil build --redo 123456              # remove a study from the workbook and add it again
 virgil build -v                         # also list each run that needs review, and why
 virgil build --no-links                 # does not offer to open links for new studies, also in settings.yaml

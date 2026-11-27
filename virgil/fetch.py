@@ -279,7 +279,7 @@ def pull_one(gse, out_dir):
 
     series= get_series(gse)
     samples = get_samples(gse)
-    print(f"    {len(samples)} samlpes in GEO")
+    print(f"    {len(samples)} samples in GEO")
 
     runs = get_runs(series, samples)
     print(f"    {len(runs)} runs in SRA")
