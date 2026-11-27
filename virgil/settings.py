@@ -19,6 +19,7 @@ defaults = {
     },
     "weak_fields": ["tissue", "source_name"],
     "other_fields": ["genotype", "sgrna", "stimulation", "transfection"],
+    "varying_fields": ["growth_protocol"],
     "ignore_values": ["n/a", "na", "--", "-", "hg19", "hg38"],
     "untreated_values": ["nt", "untreated", "control", "none", "no treatment", "mock"],
     "offer_to_open_links": True,
@@ -47,7 +48,7 @@ def load_settings(path):
     for key, value in user.items():
         
         if key not in defaults:
-            print(f"Ignoring unknown setting '{key} in {path.name} (typo?)")
+            print(f"Ignoring unknown setting '{key}' in {path.name} (typo?)")
             continue
 
         if isinstance(defaults[key], list) and isinstance(value, str):

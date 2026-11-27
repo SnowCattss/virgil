@@ -42,7 +42,12 @@ def read_tsv_folder(folder, skip_gses=()):
             problems.append(f"{path.name}: no runs in file, skip")
             continue
 
-        #two files for the same GSE: keep both runs
+        #two files for the same GSE: keep each run once, so counts aren't doubled
+        have= {run["SRR"] for run in studies.get(gse, [])}
+        new_rows= [row for row in rows if row["SRR"] not in have]
+        
+        if have:
+            problems.append(f"{path.name}: another file for {gse}, {len(new_rows)} new runs taken from it")
         studies.setdefault(gse, []).extend(rows)
     
     return studies, problems

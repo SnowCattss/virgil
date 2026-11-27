@@ -333,3 +333,11 @@ def pull_one(gse, out_dir):
     
     print(f"     saved {out_file.name}")
     return len(rows)
+
+def clean_gse(text):
+    text= text.strip().upper()
+
+    if text.isdigit():
+        text= "GSE" + text
+    
+    return text if re.fullmatch(r"GSE\d+", text) else ""

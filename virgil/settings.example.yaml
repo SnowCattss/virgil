@@ -7,17 +7,17 @@ tsv_dir: GEO Metadata
 # The workbook virgil write to. If it exists it will update, if not it is created
 workbook: combined_metadata.xlsx
 
-# Only runs with one of these LibraryStrategy values go on the 'Overview' sheet
+# Only runs with one of these LibraryStrategy values go on the 'Runs overview' sheet
 # All runs go on the 'Raw' sheet
 assays: [ATAC-seq]
 
-# Only runs from one of these organisms go on the 'Overview' sheet
+# Only runs from one of these organisms go on the 'Runs overview' sheet
 organisms: [Homo sapiens]
 
 # What to write when something is known to be empty
 empty_value: None
 
-# Where each 'Overview' column comes from, order is preference
+# Where each 'Runs overview' column comes from, order is preference
 # Names are the column headers in the .tsv files
 fields:
   Cell_line: [cell.line, cell_line, cell.type, tissue, source_name]
@@ -29,7 +29,11 @@ fields:
 weak_fields: [tissue, source_name]
 
 # Extra columns joined into 'Others' as "name: value; name: value"
-others_fields: [genotype, sgrna, stimulation, transfection]
+other_fields: [genotype, sgrna, stimulation, transfection]
+
+# Long fields that usually describe the whole study, added to Others only when they differ between runs of the same study
+# Add treatment_protocol here too if you like 
+varying_fields: [growth_protocol]
 
 # Values that are treated as empty
 ignore_values: ["n/a", na, "--", "-", hg19, hg38]
