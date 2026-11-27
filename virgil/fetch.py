@@ -13,6 +13,7 @@ Used by...
 import csv
 import io
 import re
+import socket
 import ssl
 import sys
 import time
@@ -54,11 +55,18 @@ def download_text(url, params, tries=3):
         except urllib.error.URLError as error:
             if isinstance(error.reason, ssl.SSLError):
                 sys.exit("\nCertification Error. See ReadMe")
-            
-            if attempt == tries:
+
+            if attempt== tries:
                 raise
             print(f"    connection problem ({error.reason}), retrying...")
             time.sleep(2 * attempt)
+
+        except socket.timeout:
+            # Server conneded but stopped responding
+            if attempt== tries:
+                raise
+            print("    timed out, retrying...")
+            time.sleep(2* attempt)
 
     raise RuntimeError(f"gave up after {tries} tries: {full_url}")
 

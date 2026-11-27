@@ -67,12 +67,12 @@ Needs Python 3.8 or newer.
 > **Applications → Python 3.x** and double-click **Install Certificates.command**, then try again. This only has to be done once. (Or delete and use 
 > brew)
 
-2) Open terminal where you want virgil to download
+2) Open terminal where you want virgil to download, then enter below commands
 
 ```bash
 git clone https://github.com/SnowCattss/virgil.git
 cd virgil
-git checkout v0.1.0             # the released version; leave out for the newest code (might cause breakage)
+git checkout v0.1.1             # the released version; leave out for the newest code (might cause breakage)
 python3 -m venv .venv
 source .venv/bin/activate
 pip install .
@@ -95,12 +95,12 @@ Needs Python 3.8 or newer.
 
 3) Download and install Git from [git-scm.com/downloads/win](https://git-scm.com/downloads/win)
 
-4) Open cmd where you want virgil to download
+4) Open cmd where you want virgil to download, then enter below commands
 
 ```bat
 git clone https://github.com/SnowCattss/virgil.git
 cd virgil
-git checkout v0.1.0
+git checkout v0.1.1
 py -m venv .venv
 .venv\Scripts\activate
 pip install .
