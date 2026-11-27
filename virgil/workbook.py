@@ -37,7 +37,7 @@ reviewable= {
 
 WRAPPED= {studies:["What the experiment compares"], runs: ["Others"]}
 
-RED = PatternFill("solid", start_color="F4B6B6", end_color="F4B6B6")
+RED = PatternFill(bgColor="FFF4B6B6")
 HEADER_FILL= PatternFill("solid", fgColor="305496")
 HEADER_FONT= Font(bold=True, color="FFFFFF")
 LINK_FONT= Font(color="0563C1", underline="single")
