@@ -255,23 +255,42 @@ def get_runs_for(accession):
     
     return read_runinfo(text)
 
-def get_fastq_links(run_ids):
-    """{SRR: {fastq_ftp, fastq_aspera, fastq_md5}} from ENA"""
+def get_fastq_links(runs):
+    """{SRR: {fastq_ftp, fastq_aspera, fastq_md5}} from ENA. one request per SRA study."""
+    fields = "run_accession,fastq_ftp,fastq_aspera,fastq_md5"
     links = {}
 
-    for srr in run_ids:
+    # One request per SRA study (SRP) returns the links for all of its runs.
+    for study in sorted({run.get("SRAStudy", "") for run in runs} - {""}):
+        try:
+            text = download_text(ENA_URL, {"accession": study, "result": "read_run",
+                                           "format": "tsv", "fields": fields})
+        
+        except (OSError, RuntimeError) as error:
+            print(f"    no ENA links for {study} ({error}), trying run by run")
+            continue
+        
+        for row in csv.DictReader(io.StringIO(text), delimiter="\t"):
+            links[row.get("run_accession", "")] = row
+
+    # Anything still missing (no SRP, or the study request failed) one run at a time.
+    for run in runs:
+        srr = run["Run"]
+        
+        if srr in links:
+            continue
         
         try:
-            text = download_text(ENA_URL, {
-                "accession": srr, "result": "read_run", "format": "tsv", "fields": "run_accession,fastq_ftp,fastq_aspera,fastq_md5"
-            })
+            text = download_text(ENA_URL, {"accession": srr, "result": "read_run",
+                                           "format": "tsv", "fields": fields})
+        
         except (OSError, RuntimeError) as error:
             print(f"    no ENA links for {srr} ({error})")
             continue
-
-        for row in csv.DictReader(io.StringIO(text), delimiter= "\t"):
+        
+        for row in csv.DictReader(io.StringIO(text), delimiter="\t"):
             links[row.get("run_accession", srr)] = row
-
+    
     return links
 
 def pull_one(gse, out_dir):
@@ -279,7 +298,7 @@ def pull_one(gse, out_dir):
 
     series= get_series(gse)
     samples = get_samples(gse)
-    print(f"    {len(samples)} samples in GEO")
+    print(f"    {len(samples)} samlpes in GEO")
 
     runs = get_runs(series, samples)
     print(f"    {len(runs)} runs in SRA")
@@ -288,7 +307,7 @@ def pull_one(gse, out_dir):
         raise RuntimeError("No SRA runs found")
 
     sample_by_srx = {sample["SRX_from_geo"]: sample for sample in samples}
-    fastq = get_fastq_links([run["Run"] for run in runs])
+    fastq = get_fastq_links(runs)
 
     pubmed = ";".join(series.get("Series_pubmed_id", []))
     series_title = first(series, "Series_title")

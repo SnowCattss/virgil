@@ -8,6 +8,7 @@ failed.txt
 backups/
 ~tmp_*
 tests/
+gses.txt
 
 # Python
 __pycache__/
