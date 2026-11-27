@@ -72,7 +72,7 @@ Needs Python 3.8 or newer.
 ```bash
 git clone https://github.com/SnowCattss/virgil.git
 cd virgil
-git checkout v0.1.1             # the released version; leave out for the newest code (might cause breakage)
+git checkout v0.1.2             # the released version; leave out for the newest code (might cause breakage)
 python3 -m venv .venv
 source .venv/bin/activate
 pip install .
@@ -100,7 +100,7 @@ Needs Python 3.8 or newer.
 ```bat
 git clone https://github.com/SnowCattss/virgil.git
 cd virgil
-git checkout v0.1.1
+git checkout v0.1.2
 py -m venv .venv
 .venv\Scripts\activate
 pip install .

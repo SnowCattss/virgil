@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 – Selva oscura
+
+- Review cells now show red in Excel
+
 ## 0.1.1 - Selva oscura
 
 - FASTQ links are looked up once per SRA study instead of once per run
